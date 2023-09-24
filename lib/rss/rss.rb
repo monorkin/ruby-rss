@@ -453,6 +453,26 @@ EOC
 EOC
     end
 
+    def float_writer(name, disp_name=name)
+      module_eval(<<-EOC, *get_file_and_line_from_caller(2))
+      def #{name}=(new_value)
+        if new_value.nil?
+          @#{name} = new_value
+        else
+          if @do_validate
+            begin
+              @#{name} = Float(new_value)
+            rescue ArgumentError
+              raise NotAvailableValueError.new('#{disp_name}', new_value)
+            end
+          else
+            @#{name} = new_value.to_f
+          end
+        end
+      end
+EOC
+   end
+
     def integer_writer(name, disp_name=name)
       module_eval(<<-EOC, *get_file_and_line_from_caller(2))
       def #{name}=(new_value)
